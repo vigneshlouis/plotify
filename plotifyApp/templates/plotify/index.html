@@ -1,0 +1,351 @@
+{%extends 'plotify/layouts/main.html'%}
+{%load static%}
+{% block title%}
+Plotify|Data Visualizer
+{%endblock title%}
+
+{% block content%}
+
+
+
+  <div class="container-fluid mx-auto " style="background-color: #F2FFE9; height: 100vh; margin-top: 100px;">
+    <div class="row">
+      <div class="col-lg-5 col-md-12 column-divider">
+        
+        <div class="col-12 my-2">
+            
+          <form method="post" action="{% url 'getfile' %}" class="form-inline" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="filename" value="{{filename}}">
+            <input type="file" name="file" accept=".csv, .xlsx, .xls" class="form-control file-input">
+
+            <div class="text-center">
+                <button type="submit" name="submitbtn" class="btn btn-outline-success my-3" style="font-weight: bolder;">Upload</button>
+            </div>
+        </form>
+        
+        </div>
+        <div class="clo-lg-12">
+          <form method="post" action="{% url 'make_plot' %}" id="plotForm">
+            <div class="row">
+                {% csrf_token %}
+                <div class="col-lg-12 col-md-12 my-3">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle w-100" style="background-color: #294B29;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Select plots
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="plotCheckboxesDiv">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="histogram1" value="histogram" name="selected_plots">
+                                <label class="form-check-label" for="histogram">histogram </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lineplot" value="lineplot" name="selected_plots">
+                                <label class="form-check-label" for="lineplot">lineplot</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="heatmap" value="heatmap" name="selected_plots">
+                                <label class="form-check-label" for="heatmap">heatmap</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="scatterplot" value="scatterplot" name="selected_plots">
+                              <label class="form-check-label" for="scatterplot">scatterplot</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="boxplot" value="boxplot" name="selected_plots">
+                            <label class="form-check-label" for="boxplot">boxplot</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="barplot" value="barplot" name="selected_plots">
+                          <label class="form-check-label" for="barplot">barplot</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="violinplot" value="violinplot" name="selected_plots">
+                        <label class="form-check-label" for="violinplot">violinplot</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="piechart" value="piechart" name="selected_plots">
+                      <label class="form-check-label" for="piechart">piechart</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="regressionplot" value="regressionplot" name="selected_plots">
+                    <label class="form-check-label" for="regressionplot">regressionplot</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pairplot" value="pairplot" name="selected_plots">
+                  <label class="form-check-label" for="pairplot">pairplot</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="lineplot3D" value="lineplot3D" name="selected_plots">
+                <label class="form-check-label" for="lineplot3D">3D line plot</label>
+            </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="surface3D" value="surface3D" name="selected_plots">
+                <label class="form-check-label" for="surface3D">3D surface</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="bubble3D" value="bubble3D" name="selected_plots">
+              <label class="form-check-label" for="bubble3D">3D bubble plot</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="scater3D" value="scatter3D" name="selected_plots">
+            <label class="form-check-label" for="scatter3D"> 3D scatter plot</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="contour3D" value="contour3D" name="selected_plots">
+          <label class="form-check-label" for="contour3D">3D contour plot</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="ribbon3D" value="ribbon3D" name="selected_plots">
+        <label class="form-check-label" for="ribbon3D">3D ribbon plot</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="barplot3D" value="barplot3D" name="selected_plots">
+      <label class="form-check-label" for="barplot3D">3D bar plot</label>
+  </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="d-flex flex-wrap justify-content-evenly" id="columnCheckboxesDiv">
+                    {% if heads1 %}
+                        {% for head in heads1 %}
+                            <div class="form-check mb-3 mx-2">
+                                <input class="form-check-input column-checkbox" type="checkbox" name="selected_columns" value="{{ head }}" id="{{ head }}">
+                                <label class="form-check-label" for="{{ head }}">
+                                    {{ head }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 my-3 text-center">
+                <button type="submit" class="btn btn-outline-success">make plot</button>
+            </div>
+        </form>
+        
+      
+    </div>
+    
+              
+
+                      
+                      
+                      
+                     
+          
+      </div>
+      <div class="col-lg-7 col-md-12" >
+        <div class="row">
+        <div class="col-lg-6">{{pltt_type}}</div>
+         
+            
+                    <div class="col-lg-3 col-md-12 my-2">
+                       
+                            <button class="btn btn-secondary dropdown-toggle w-100" style="background-color: #E0CCBE; color: #1F2544; font-weight: bolder;"
+                             type="button" onclick="scrollToDataset()" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                See Insights
+                            </button>
+                            
+                                       
+                                </div>
+                                <div class="col-lg-3 col-md-12 my-2">
+                       
+                                  <button class="btn btn-secondary dropdown-toggle w-100" style="background-color: #E0CCBE; color: #1F2544; font-weight: bolder;" 
+                                  type="button" id="dropdownMenuButton">See Dataset</button>
+                                      </div>
+                            
+                        
+                    
+                   
+                          </div>
+                     
+
+       
+        <!-- Add an iframe in the second column -->
+        {% if plot_data %}
+        
+        <div class="image-container"style="margin-left: 40px;">
+          <!-- Image -->
+          <img id="imageFrame" src="data:image/png;base64,{{ plot_data }}" alt="Image" style="width: 90%; height: 70%;"class="img-fluid file-input">
+      </div>
+      
+      <!-- Fullscreen button -->
+      <div class="fullscreen-button" onclick="toggleFullscreen()">Fullscreen</div>
+      
+        
+        {%else%}
+        <img src="{% static 'images/Data-Visualization-thumbnail.jpg' %}" alt="Data Visualization Thumbnail" style="width: 100%; height: 70%;" class="img-fluid file-input">
+{%endif%}
+      
+    </div> </div>
+    {%if insights1%}
+        <div width="100vh"style="overflow:scroll;margin-top:50px;"id="dataset_section">
+            <table id="table1">
+
+                <tr><th>insights</th>
+                     {% for i in heads1%}
+                      <th>{{i}}</th>
+                    {%endfor%}
+                    </tr>
+                <tr><th>mean</th>
+                    {% for i in mean%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+                 <tr><th>median</th>
+                    {% for i in median%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>min value</th>
+                    {% for i in min_value%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>max value</th>
+                    {% for i in max_value%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>count</th>
+                    {% for i in count%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>75th percentile</th>
+                    {% for i in percentile_75%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>25th percentile</th>
+                    {% for i in percentile_25%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+ <tr><th>standard deviation</th>
+                    {% for i in std%}
+                    <td>{{i}}</td>
+                    {%endfor%}
+
+                </tr>
+
+
+            </table>
+        </div>
+        {%endif%}
+  </div>
+    {%endblock content%}
+
+    {%block scripts%}
+    <script>
+      // JavaScript function to scroll to the dataset section
+      function scrollToDataset() {
+          var datasetSection = document.getElementById('dataset_section');
+          if (datasetSection) {
+              datasetSection.scrollIntoView({ behavior: 'smooth' });
+          }
+      }
+      function toggleFullscreen() {
+        var img = document.getElementById('imageFrame');
+        if (!document.fullscreenElement && !document.mozFullScreenElement &&
+            !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (img.requestFullscreen) {
+                img.requestFullscreen();
+            } else if (img.msRequestFullscreen) {
+                img.msRequestFullscreen();
+            } else if (img.mozRequestFullScreen) {
+                img.mozRequestFullScreen();
+            } else if (img.webkitRequestFullscreen) {
+                img.webkitRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+    var plotCheckboxes = document.querySelectorAll('#plotCheckboxesDiv input[type="checkbox"]');
+    var columnCheckboxes = document.querySelectorAll('#columnCheckboxesDiv input[type="checkbox"]');
+
+    plotCheckboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            if (this.checked) {
+                plotCheckboxes.forEach(function (otherCheckbox) {
+                    if (otherCheckbox !== checkbox) {
+                        otherCheckbox.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    var checkedColumnCheckboxes = [];
+    columnCheckboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            if (this.checked) {
+                if (checkedColumnCheckboxes.length >= 3) {
+                    // If already three checkboxes are checked, uncheck the oldest one
+                    checkedColumnCheckboxes.shift().checked = false;
+                }
+                checkedColumnCheckboxes.push(this);
+            } else {
+                checkedColumnCheckboxes.splice(checkedColumnCheckboxes.indexOf(this), 1);
+            }
+        });
+    });
+
+    document.getElementById('plotForm').addEventListener('submit', function (event) {
+        // Get all the checked plot checkboxes
+        var checkedPlots = Array.from(plotCheckboxes).filter(function (checkbox) { return checkbox.checked; });
+        // If no plot checkboxes are checked, prevent form submission and show an alert
+        if (checkedPlots.length === 0) {
+            event.preventDefault();
+            alert('Please select a plot.');
+        }
+    });
+});
+document.addEventListener("DOMContentLoaded", function() {
+    // Select all links with hash fragments
+    var links = document.querySelectorAll('a[href^="#"]');
+    
+    // Loop through each link and attach a click event listener
+    links.forEach(function(link) {
+        link.addEventListener("click", function(event) {
+            // Prevent default behavior of anchor links
+            event.preventDefault();
+            
+            // Get the target element's ID from the href attribute
+            var targetId = this.getAttribute("href").substring(1);
+            var targetElement = document.getElementById(targetId);
+            
+            // Scroll smoothly to the target element
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: "smooth"
+                });
+            }
+        });
+    });
+});
+
+
+
+   
+  </script> {%endblock scripts%}

@@ -1,0 +1,50 @@
+    /* Custom CSS for styling */
+    .navbar {
+        background-color: #1f2544;
+        color: white;
+        font-weight: bold;
+      }
+      .navbar-brand {
+        color: white !important;
+      }
+      .nav-link {
+        color: white !important;
+      }
+      .item {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-bottom: 10px;
+      }
+      .dropdown-menu {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .scrollable-table {
+        max-height: 300px;max-width: 800px;
+        overflow-x: auto;
+      }
+      .scrollable-table1 {
+        max-height: 300px;max-width: 800px;
+        overflow-x: auto;
+      }
+      .flex-item {
+    flex: 0 0 calc(20% - 10px); /* 20% width with 10px margin */
+    margin: 5px; /* Adjust margin as needed */
+  }
+  
+  @media (max-width: 992px) {
+    .flex-item {
+      flex: 0 0 calc(25% - 10px); /* Change to 25% width on smaller screens */
+    }
+  }
+  .file-input {
+    border: 2px solid #007bff; /* Blue border */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Blue shadow */
+    padding: 8px; /* Adjust padding as needed */
+  }
+  
+  /* On focus, change border and shadow color */
+  .file-input:focus {
+    border-color: #0056b3; /* Darker blue */
+    box-shadow: 0 0 8px rgba(0, 86, 179, 0.7); /* Darker shadow */
+  }
